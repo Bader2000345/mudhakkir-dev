@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>مُذكّر · المطوّر</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="تطبيق فريق مُذكّر: رسائل المستخدمين والأرقام والإعلانات">
+    <meta name="theme-color" content="#F1F0EA" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#161915" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="مُذكّر · المطوّر">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/favicon-64.png" sizes="64x64" type="image/png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300..700&family=Noto+Kufi+Arabic:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+    <!-- د1 الدخول: 8 خانات، و«أنا صاحب التطبيق» لكلمة السر -->
+    <section class="login" id="login" hidden>
+        <div class="logo" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M10 34V19a10 10 0 0 1 20 0v15Z"/><path d="M15 34V21a5 5 0 0 1 10 0v13"/></svg></div>
+        <h1>أهلين بفريق مُذكّر</h1>
+
+        <form id="code-form" class="owner-form" novalidate>
+            <p class="lead" id="code-lead">اكتب الرمز يلي وصلك</p>
+            <div class="boxes" id="boxes" role="group" aria-label="رمز الدخول، 8 حروف وأرقام">
+                <input id="c1" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="الحرف 1">
+                <input id="c2" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="الحرف 2">
+                <input id="c3" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="الحرف 3">
+                <input id="c4" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="الحرف 4">
+                <span class="dash" aria-hidden="true">-</span>
+                <input id="c5" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="الحرف 5">
+                <input id="c6" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="الحرف 6">
+                <input id="c7" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="الحرف 7">
+                <input id="c8" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="الحرف 8">
+            </div>
+            <p class="status" id="code-status" role="alert"></p>
+            <button class="btn wide" id="code-go" type="submit" disabled>دخول</button>
+            <button class="link" id="to-owner" type="button">أنا صاحب التطبيق</button>
+        </form>
+
+        <form id="owner-form" class="owner-form" novalidate hidden>
+            <p class="lead">كلمة السر يلي حطّيتها بـ Cloudflare</p>
+            <label class="vh" for="owner-key">كلمة السر</label>
+            <input class="field" id="owner-key" type="password" autocomplete="current-password" placeholder="كلمة السر">
+            <p class="status" id="owner-status" role="alert"></p>
+            <button class="btn wide" id="owner-go" type="submit">دخول</button>
+            <button class="link" id="to-code" type="button">رجوع للرمز</button>
+        </form>
+    </section>
+
+    <!-- التطبيق بعد الدخول -->
+    <div class="shell" id="shell" hidden>
+        <header class="top">
+            <button class="back" id="back" type="button" hidden><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><span id="back-l">كل الرسائل</span></button>
+            <h1 id="title">الرسائل</h1>
+            <button class="avatar" id="me-btn" type="button" aria-label="حسابي والإشعارات"></button>
+        </header>
+        <main class="view" id="view" aria-live="polite"></main>
+        <!-- ت1 شريط تحت: بيبين بس للمشرف ولصاحب التطبيق -->
+        <nav class="tabbar" id="tabbar" aria-label="الأقسام" hidden></nav>
+    </div>
+
+    <div class="sheet-wrap" id="sheet" hidden>
+        <div class="scrim" data-close></div>
+        <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h" id="sheet-body"></div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js" defer></script>
+</body>
+</html>
