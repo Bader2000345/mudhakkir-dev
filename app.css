@@ -3,10 +3,13 @@
  * نفس ألوان وخطوط مُذكّر (معرض الفريق ه1): فاتح ورقي وداكن ليلي حسب الجهاز.
  * التنقل شريط تحت (ت1)، الرسالة محادثة (ر2)، الفريق قائمة أشخاص (ف1).
  * ===================================================================== */
+/* النسخة 3 (مع مُذكّر 32): نفس ألوان مُذكّر الجديدة، 60-30-10 (ل2 «زمرّد وعاج» ق1، مخففة):
+   --bg عاجي 60٪ · --card زمرّدي فاتح 30٪ · --ac ذهبي 10٪ للأزرار (والكتابة فوقو --aci)
+   --ac-ink: لون الكتابة والأيقونات المميّزة (زمرّدي غامق بالنهار، ذهبي بالليل)، لأنو الذهبي ما بيبين ككتابة عالعاجي */
 :root {
-  --bg:#F1F0EA; --card:#E7E5DC; --card-2:#DCDAD0; --ink:#1C241F; --mut:#575C53;
-  --ac:#2D4739; --aci:#F3F2EC; --ac2:#A98A3E; --ac2-ink:#6E5716;
-  --line:color-mix(in srgb, var(--ink) 11%, transparent); --field:#F7F6F1;
+  --bg:#F4F3EE; --card:#DBE6E0; --card-2:#CDDBD3; --ink:#1F2D27; --mut:#58685F;
+  --ac:#C9A04A; --aci:#231B0B; --ac-ink:#215A48; --ac2:#C49B45; --ac2-ink:#7A5B1E;
+  --line:color-mix(in srgb, var(--ink) 11%, transparent); --field:#FAF9F5;
   --ok:#3F7A4F; --warn:#B4532F; --danger:#A8392E;
   --t-complaint:#a3592e; --t-idea:#7f5f22; --t-bug:#b23f33; --t-thanks:#0f5c48;
   --font:"Readex Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -17,8 +20,8 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:#161915; --card:#21251F; --card-2:#2A2F27; --ink:#EDEDE4; --mut:#A3A797;
-    --ac:#CDA75F; --aci:#1A1408; --ac2:#9DB592; --ac2-ink:#B9CDB0; --field:#1C201B;
+    --bg:#121A17; --card:#1B2B25; --card-2:#23362E; --ink:#DDE6E1; --mut:#9BADA4;
+    --ac:#D2B062; --aci:#1A1409; --ac-ink:#D2B062; --ac2:#C9A85E; --ac2-ink:#D2B062; --field:#16221E;
     --ok:#8FC39D; --warn:#E08B6B; --danger:#EF8D80;
     --t-complaint:#e0a37a; --t-idea:#e0c27a; --t-bug:#ef8d80; --t-thanks:#6fd0ad; color-scheme:dark;
   }
@@ -46,7 +49,7 @@ button, a, summary, label, [role="button"] { touch-action:manipulation; }
 h1, h2, h3 { font-family:var(--title); line-height:1.35; margin:0; text-wrap:balance; }
 p { margin:0; }
 [hidden] { display:none !important; }
-:focus-visible { outline:2px solid var(--ac2); outline-offset:2px; }
+:focus-visible { outline:2px solid var(--ac-ink); outline-offset:2px; }
 svg.i { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex:none; }
 .vh { position:absolute !important; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 
@@ -57,7 +60,7 @@ svg.i { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.
 .btn.soft { background:var(--card-2); color:var(--ink); }
 .btn.danger { background:color-mix(in srgb, var(--danger) 14%, var(--card)); color:var(--danger); }
 .btn.wide { width:100%; }
-.link { border:0; background:none; padding:6px 10px; min-height:44px; color:var(--ac); font-weight:600; text-decoration:underline; text-underline-offset:4px; }
+.link { border:0; background:none; padding:6px 10px; min-height:44px; color:var(--ac-ink); font-weight:600; text-decoration:underline; text-underline-offset:4px; }
 
 /* ===== شاشة الدخول (د1) ===== */
 .login { min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center;
@@ -69,8 +72,8 @@ svg.i { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.
 /* الخانات بشبكة: بتصغر لحالها على الجوالات الضيقة بلا ما تطلع برّا الشاشة */
 .boxes { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)) 12px repeat(4, minmax(0, 1fr)); gap:5px; direction:ltr; align-items:center; width:100%; margin-top:4px; }
 .boxes input { width:100%; min-width:0; height:50px; border-radius:12px; border:1.5px solid color-mix(in srgb, var(--ink) 18%, transparent); background:var(--field);
-  font:700 20px/1 var(--mono); text-align:center; text-transform:uppercase; padding:0; caret-color:var(--ac); }
-.boxes input:focus { outline:none; border-color:var(--ac); box-shadow:0 0 0 3px color-mix(in srgb, var(--ac) 22%, transparent); }
+  font:700 20px/1 var(--mono); text-align:center; text-transform:uppercase; padding:0; caret-color:var(--ac-ink); }
+.boxes input:focus { outline:none; border-color:var(--ac-ink); box-shadow:0 0 0 3px color-mix(in srgb, var(--ac-ink) 22%, transparent); }
 .boxes .dash { color:var(--mut); font-weight:700; text-align:center; }
 @media (max-width:340px) { .boxes input { height:44px; font-size:17px; } .boxes { gap:3px; } }
 .status { min-height:22px; font-size:13.5px; color:var(--mut); max-width:34ch; }
@@ -79,7 +82,7 @@ svg.i { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.
 .login .btn { min-width:220px; }
 .owner-form { display:grid; gap:10px; width:min(380px, 100%); }
 .field { width:100%; border-radius:12px; border:1.5px solid color-mix(in srgb, var(--ink) 18%, transparent); background:var(--field); padding:11px 13px; }
-.field:focus { outline:none; border-color:var(--ac); }
+.field:focus { outline:none; border-color:var(--ac-ink); }
 textarea.field { resize:vertical; min-height:96px; line-height:1.6; }
 
 /* ===== الهيكل ===== */
@@ -88,9 +91,9 @@ textarea.field { resize:vertical; min-height:96px; line-height:1.6; }
 .top { position:sticky; top:0; z-index:5; background:var(--bg); display:flex; align-items:center; gap:10px;
   padding:calc(12px + var(--safe-t)) max(16px, env(safe-area-inset-right, 0px), calc((100% - 720px) / 2 + 16px)) 10px max(16px, env(safe-area-inset-left, 0px), calc((100% - 720px) / 2 + 16px)); }
 .top h1 { font-size:22px; flex:1; min-width:0; }
-.top .back { display:inline-flex; align-items:center; gap:2px; border:0; background:none; color:var(--ac); font-weight:600; padding:6px 0; margin-inline-end:auto; min-height:42px; }
-.icon-btn { width:42px; height:42px; border-radius:50%; border:0; background:var(--card); color:var(--ac); display:grid; place-items:center; flex:none; }
-.avatar { width:42px; height:42px; border-radius:50%; border:0; background:var(--card); color:var(--ac); font:700 16px/1 var(--title); flex:none; }
+.top .back { display:inline-flex; align-items:center; gap:2px; border:0; background:none; color:var(--ac-ink); font-weight:600; padding:6px 0; margin-inline-end:auto; min-height:42px; }
+.icon-btn { width:42px; height:42px; border-radius:50%; border:0; background:var(--card); color:var(--ac-ink); display:grid; place-items:center; flex:none; }
+.avatar { width:42px; height:42px; border-radius:50%; border:0; background:var(--card); color:var(--ac-ink); font:700 16px/1 var(--title); flex:none; }
 main.view { max-width:720px; margin:0 auto; padding:4px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); display:grid; gap:12px; }
 .lead { color:var(--mut); font-size:14px; }
 
@@ -99,7 +102,7 @@ main.view { max-width:720px; margin:0 auto; padding:4px max(16px, env(safe-area-
   border-top:1px solid var(--line); padding:6px max(8px, env(safe-area-inset-right, 0px)) calc(8px + var(--safe-b)) max(8px, env(safe-area-inset-left, 0px)); }
 .tab { border:0; background:none; display:grid; justify-items:center; gap:2px; padding:4px 0; color:var(--mut); font-size:11.5px; position:relative; min-height:48px; }
 .tab svg { width:23px; height:23px; }
-.tab[aria-current="page"] { color:var(--ac); font-weight:600; }
+.tab[aria-current="page"] { color:var(--ac-ink); font-weight:600; }
 .tab .badge { position:absolute; top:0; inset-inline-end:calc(50% - 24px); min-width:18px; height:18px; padding:0 5px; border-radius:999px;
   background:var(--ac); color:var(--aci); font-size:11px; line-height:18px; font-weight:700; }
 @media (min-width:900px) { .tabbar { inset:auto 50% 16px auto; transform:translateX(50%); width:min(560px, 92vw); border-radius:20px; border:1px solid var(--line); padding-bottom:8px; } }
@@ -189,7 +192,7 @@ main.view { max-width:720px; margin:0 auto; padding:4px max(16px, env(safe-area-
 
 /* ===== الفريق (ف1) ===== */
 .person { background:var(--card); border-radius:16px; padding:10px 12px; display:flex; align-items:center; gap:10px; }
-.av { width:38px; height:38px; border-radius:50%; display:grid; place-items:center; font:700 15px/1 var(--title); background:var(--card-2); color:var(--ac); flex:none; }
+.av { width:38px; height:38px; border-radius:50%; display:grid; place-items:center; font:700 15px/1 var(--title); background:var(--card-2); color:var(--ac-ink); flex:none; }
 .person .who { flex:1; min-width:0; }
 .person b { font-weight:600; }
 .person small { display:block; color:var(--mut); font-size:12.5px; }
@@ -235,7 +238,7 @@ main.view { max-width:720px; margin:0 auto; padding:4px max(16px, env(safe-area-
 .inst-steps li { counter-increment:st; display:flex; align-items:center; gap:10px; background:var(--card-2); border-radius:14px; padding:9px 12px; font-size:13px; line-height:1.75; }
 .inst-steps li::before { content:counter(st); flex:none; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; background:var(--ac); color:var(--aci); font-size:12px; font-weight:700; }
 .inst-steps b { font-weight:600; }
-.inst-steps .k { display:inline-grid; place-items:center; min-width:24px; height:24px; padding:0 4px; margin:0 2px; border-radius:7px; background:var(--bg); color:var(--ac); font-style:normal; font-weight:700; vertical-align:middle; }
+.inst-steps .k { display:inline-grid; place-items:center; min-width:24px; height:24px; padding:0 4px; margin:0 2px; border-radius:7px; background:var(--bg); color:var(--ac-ink); font-style:normal; font-weight:700; vertical-align:middle; }
 .inst-steps .k svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .inst-steps.pulse li { animation:stepPulse .9s ease-out both; }
 .inst-steps.pulse li:nth-child(2) { animation-delay:.13s; } .inst-steps.pulse li:nth-child(3) { animation-delay:.26s; }

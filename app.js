@@ -22,7 +22,7 @@
     const VAPID = 'BHIWTXCv4Gmy6fy5fbsJ_NX4fLD0dkEo2PqyCVWzmbxaxw8xo8Ud9eMw_rZOp_qxOaDkSEThGzQbhQhSCQ6p2_8';
     const APP_URL = 'https://bader2000345.github.io/mudhakkir-dev/';
     const LIVE_VERSION = 'https://bader2000345.github.io/reminder/version.json';
-    const VERSION = 2;
+    const VERSION = 3;
     // mudhakkir-dev-id و mudhakkir-dev-device: نفس مفاتيح صفحة المطوّر القديمة بمُذكّر (نفس الموقع)،
     // فجهاز صاحب التطبيق يلي كان مسجّل بيفوت لحالو وما بينحسب جهاز جديد
     const K = { tok: 'mdt-tok', me: 'mdt-me', push: 'mdt-push', pushAt: 'mdt-push-at', inst: 'mdt-install-hide', dev: 'mudhakkir-dev-id', legacy: 'mudhakkir-dev-device' };
