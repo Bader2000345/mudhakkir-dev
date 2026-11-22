@@ -1,8 +1,8 @@
 /* فريق مُذكّر — sw.js
  * الملفات بتنحفظ حتى يفتح التطبيق بسرعة (وبلا نت بيبين آخر شي)، والإشعار «رسالة جديدة» من السيرفر.
  * غيّر CACHE مع كل تحديث للملفات. */
-const CACHE = 'mdt-v1';
-const FILES = ['./', './index.html', './app.css', './app.js', './manifest.json', './icons/icon-192.png', './icons/icon-512.png', './icons/favicon-64.png', './icons/apple-touch-icon.png'];
+const CACHE = 'mdt-v2';
+const FILES = ['./', './index.html', './app.css', './app.js', './manifest.json', './icons/icon-192.png', './icons/icon-512.png', './icons/favicon-64.png', './icons/apple-touch-icon.png', './icons/badge-96.png'];
 
 self.addEventListener('install', event => {
     event.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -32,7 +32,8 @@ self.addEventListener('push', event => {
     event.waitUntil((async () => {
         await self.registration.showNotification(title, {
             body: msg && msg.body ? String(msg.body).slice(0, 400) : '', tag: String((msg && msg.tag) || 'mdt-msg').slice(0, 40), renotify: true,
-            icon: './icons/icon-192.png', badge: './icons/favicon-64.png', lang: 'ar', dir: 'rtl', data: { url: './' }
+            // badge: أبيض على شفاف (النسخة 2)، الملوّنة كانت تطلع مربّع بشريط الحالة بأندرويد
+            icon: './icons/icon-192.png', badge: './icons/badge-96.png', lang: 'ar', dir: 'rtl', data: { url: './' }
         });
         const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
         wins.forEach(w => w.postMessage({ type: 'mdt-refresh' }));

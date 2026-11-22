@@ -1,5 +1,8 @@
 /* =====================================================================
- * فريق مُذكّر — app.js  (الإصدار 1، معرض الفريق: ه1 ش2 د1 ت1 ر2 ف1)
+ * فريق مُذكّر — app.js  (النسخة 2؛ الأولى من معرض الفريق: ه1 ش2 د1 ت1 ر2 ف1)
+ * النسخة 2 (مع مُذكّر 31): بطاقة تثبيت متل مُذكّر (بالدخول وبالرسائل وبحسابي)، و«افتح بـ Chrome» لمتصفحات الشركات،
+ *   والكتابة ما بتكبّر الشاشة، والكبسات بتنحسّ، والضغط المطوّل ما بينسخ (والنسخ من زر «نسخ النص»)،
+ *   والفحص بيبيّن التخزين وحد الإرسال (سيرفر 31).
  * تطبيق لحالو للفريق: كل شخص إلو رمز (XXXX-XXXX) ودور، وصاحب التطبيق بيدخل بكلمة السر (DEV_KEY).
  *   قارئ: الرسائل · مجاوب: + رد وأرشفة · مشرف: + الأرقام والإعلان والفحص · صاحب التطبيق: + الفريق والرموز
  * الدور بيقرّرو السيرفر (worker.js ← ROUTES)، وهون منخبّي يلي ما إلك بس.
@@ -19,7 +22,7 @@
     const VAPID = 'BHIWTXCv4Gmy6fy5fbsJ_NX4fLD0dkEo2PqyCVWzmbxaxw8xo8Ud9eMw_rZOp_qxOaDkSEThGzQbhQhSCQ6p2_8';
     const APP_URL = 'https://bader2000345.github.io/mudhakkir-dev/';
     const LIVE_VERSION = 'https://bader2000345.github.io/reminder/version.json';
-    const VERSION = 1;
+    const VERSION = 2;
     // mudhakkir-dev-id و mudhakkir-dev-device: نفس مفاتيح صفحة المطوّر القديمة بمُذكّر (نفس الموقع)،
     // فجهاز صاحب التطبيق يلي كان مسجّل بيفوت لحالو وما بينحسب جهاز جديد
     const K = { tok: 'mdt-tok', me: 'mdt-me', push: 'mdt-push', pushAt: 'mdt-push-at', inst: 'mdt-install-hide', dev: 'mudhakkir-dev-id', legacy: 'mudhakkir-dev-device' };
@@ -38,7 +41,7 @@
     const TYPES = { complaint: 'شكوى', idea: 'اقتراح', bug: 'خطأ بالتطبيق', thanks: 'شكر' };
     const FILTERS = [['all', 'الكل'], ['bug', 'أخطاء'], ['idea', 'اقتراحات'], ['complaint', 'شكاوي'], ['thanks', 'شكر'], ['archived', 'الأرشيف']];
     const INFO = {
-        platform: { android: 'أندرويد', samsung: 'سامسونج', ios: 'آيفون أو آيباد', desktop: 'كمبيوتر', inapp: 'متصفح جوّا تطبيق' },
+        platform: { android: 'أندرويد', samsung: 'سامسونج', ios: 'آيفون أو آيباد', desktop: 'كمبيوتر', inapp: 'متصفح جوّا تطبيق', other: 'أندرويد بمتصفح الشركة' },
         theme: { light: 'فاتح', dark: 'داكن' }, size: { sm: 'خط صغير', md: 'خط عادي', lg: 'خط كبير', xl: 'خط أكبر' },
         notif: { granted: 'الإشعارات مسموحة', denied: 'الإشعارات ممنوعة', default: 'الإشعارات لسا ما انطلبت', unsupported: 'ما بيدعم الإشعارات' },
         push: { on: 'الإشعار بالخلفية شغّال', outdated: 'الإشعار بالخلفية شغّال', off: 'الإشعار بالخلفية متوقف', pending: 'الإشعار بالخلفية قيد التفعيل', error: 'الإشعار بالخلفية فيه خطأ', unsupported: 'ما بيدعم الإشعار بالخلفية' }
@@ -192,6 +195,7 @@
     }
     function showLogin(msg = '') {
         $('shell').hidden = true; $('login').hidden = false;
+        $('login-inst').innerHTML = installHTML('login');
         $('owner-form').hidden = true; $('code-form').hidden = false;
         codeStatus(msg, msg ? 'err' : '');
         setTimeout(() => boxes()[0].focus(), 50);
@@ -259,11 +263,92 @@
         if (!m.replyBy) return 'صاحب التطبيق'; // ردود قبل تطبيق الفريق
         return m.replyBy === me.id ? 'إنت' : (m.replyName || 'حدا من الفريق');
     }
-    function installHTML() {
-        if (standalone() || store.get(K.inst) === '1') return '';
-        const txt = isIOS() ? 'ثبّتو عالشاشة: زر المشاركة ← «إضافة إلى الشاشة الرئيسية». عالآيفون الإشعارات بتشتغل بس بعد التثبيت.'
-            : 'ثبّتو عالشاشة متل أي تطبيق، وبيوصلك إشعار بكل رسالة جديدة.';
-        return `<div class="install"><span>${txt}</span>${deferredInstall ? '<button class="btn" type="button" data-act="install">تثبيت</button>' : ''}<button class="x" type="button" data-act="install-hide" aria-label="إخفاء">×</button></div>`;
+    // ===================== التثبيت (النسخة 2، متل مُذكّر) =====================
+    // زر «تثبيت التطبيق» بيثبّت بكبسة إذا المتصفح بيسمح، وتحتو الطريقة لجهازك. بمتصفحات الشركات (شاومي، أوبو، فيفو، هواوي…)
+    // وجوّا التطبيقات بأندرويد الزر بيصير «افتح بـ Chrome»، لأنها ما بتعرف تثبّت. ولأندرويد «ما طلعت الأيقونة؟» بخطوات كل شركة.
+    const UA = navigator.userAgent || '';
+    const ANDROID = /Android/i.test(UA), SAMSUNG = /SamsungBrowser/i.test(UA);
+    const IN_APP = /FBAN|FBAV|Instagram|WhatsApp|Line\/|Snapchat|TikTok|; wv\)/i.test(UA);
+    const OTHER = ANDROID && !IN_APP && !SAMSUNG && /MiuiBrowser|Mint Browser|HeyTapBrowser|OppoBrowser|RealmeBrowser|VivoBrowser|HuaweiBrowser|HONORBrowser|HiBrowser|UCBrowser|UCWEB|Quark\/|QQBrowser|baiduboxapp|SogouMobileBrowser|PHX\/|Opera Mini|Puffin/i.test(UA);
+    const PLAT = IN_APP ? 'inapp' : isIOS() ? 'ios' : SAMSUNG ? 'samsung' : OTHER ? 'other' : ANDROID ? 'android' : 'desktop';
+    const TO_CHROME = ANDROID && (OTHER || IN_APP);
+    const kb = s => `<i class="k">${s}</i>`;
+    const SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg>';
+    const STEPS = {
+        android: [`اكبس القائمة ${kb('⋮')} فوق بـ Chrome`, 'اختار <b>«تثبيت التطبيق»</b> أو «إضافة إلى الشاشة الرئيسية»', 'اكبس <b>«تثبيت»</b> وبيطلع بين تطبيقاتك'],
+        samsung: [`اكبس القائمة ${kb('≡')} تحت`, 'اختار <b>«إضافة صفحة إلى»</b>', 'وبعدين <b>«الشاشة الرئيسية»</b>'],
+        ios: ['افتحو بـ <b>Safari</b>', `اكبس زر المشاركة ${kb(SHARE)}`, 'اختار <b>«إضافة إلى الشاشة الرئيسية»</b> وبعدين «إضافة»'],
+        desktop: ['اكبس أيقونة التثبيت بآخر شريط العنوان', `أو من القائمة ${kb('⋮')} اختار <b>«تثبيت»</b>`, 'وبيفتح كتطبيق لحالو'],
+        other: ['اكبس <b>«افتح بـ Chrome»</b>، هالمتصفح ما بيثبّت تطبيقات', 'وبـ Chrome اكبس <b>«تثبيت التطبيق»</b>', `ما عندك Chrome؟ من قائمة هالمتصفح ${kb('⋮')} اختار «إضافة إلى الشاشة الرئيسية»`],
+        inapp: ANDROID ? ['اكبس <b>«افتح بـ Chrome»</b>', 'وهونيك اكبس <b>«تثبيت التطبيق»</b>', 'إذا ما انفتح: الرابط منسوخ، الصقو بـ Chrome']
+            : ['اكبس <b>«تثبيت التطبيق»</b> لينتسخ الرابط', 'افتحو بـ <b>Safari</b>', 'وكمّل من هونيك']
+    };
+    const BRANDS = [
+        ['xiaomi', 'شاومي وريدمي وبوكو', 'اكبس مطوّل على أيقونة Chrome ← <b>معلومات التطبيق</b> ← <b>أذونات أخرى</b> ← اسمح بـ <b>«اختصارات الشاشة الرئيسية»</b>، وارجع ثبّت من جديد.'],
+        ['oppo', 'أوبو وريلمي وون بلس', 'اكبس مطوّل على أيقونة Chrome ← <b>معلومات التطبيق</b> ← <b>الأذونات</b> ← اسمح بـ <b>«إنشاء اختصارات على الشاشة الرئيسية»</b> إذا موجود، وثبّت من جديد.'],
+        ['vivo', 'فيفو', 'الإعدادات ← التطبيقات ← Chrome ← الأذونات ← اسمح بـ <b>«اختصارات سطح المكتب»</b>، وثبّت من جديد.'],
+        ['huawei', 'هواوي وهونر', 'إذا عندك Chrome: الإعدادات ← التطبيقات ← Chrome ← الأذونات ← اسمح بـ <b>«إنشاء اختصارات»</b>. وإذا ما عندك: من متصفح هواوي القائمة ← <b>«إضافة إلى الشاشة الرئيسية»</b>.'],
+        ['transsion', 'تكنو وإنفينكس وآيتل', 'الإعدادات ← التطبيقات ← Chrome ← الأذونات ← اسمح بـ <b>«اختصارات الشاشة الرئيسية»</b>، وثبّت من جديد.'],
+        ['all', 'باقي الجوالات', 'يمكن يكون بقائمة كل التطبيقات مو عالشاشة الرئيسية: اسحب لفوق ودوّر عليه.']
+    ];
+    let brand = '';
+    const brandOf = s => /xiaomi|redmi|poco|miui|\bmi \d|^M\d{4}[A-Z0-9]+$|^2\d{6,}[A-Z0-9]*$/i.test(s) ? 'xiaomi'
+        : /oppo|heytap|realme|oneplus|^RMX\d|^CPH\d|^P[C-H][A-Z]{2}\d+|^[A-Z]{2}\d{4}$/i.test(s) ? 'oppo'
+        : /vivo|iqoo|^V\d{4}[A-Z]?$|^I\d{4}$/i.test(s) ? 'vivo'
+        : /huawei|honor|^[A-Z]{3}-[A-Z]{1,2}\d{2}[A-Z]?$/i.test(s) ? 'huawei'
+        : /tecno|infinix|itel/i.test(s) ? 'transsion' : '';
+    async function detectBrand() {
+        if (!ANDROID) return;
+        const m = UA.match(/Android [^;)]*;(?: [a-z]{2}[-_][a-z]{2};)? ([^;)]+?)(?: Build\/|\))/i);
+        brand = brandOf(UA) || (m ? brandOf(m[1].trim()) : '');
+        try { if (!brand && navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) brand = brandOf(((await navigator.userAgentData.getHighEntropyValues(['model'])).model || '').trim()); } catch (e) {}
+        if (brand) paintInstall();
+    }
+    let installed = false; // ثبّت هلّق من الزر
+    const chromeIntent = () => { const u = new URL(APP_URL); return `intent://${u.host}${u.pathname}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent('https://play.google.com/store/apps/details?id=com.android.chrome')};end`; };
+    // where: login (بشاشة الدخول) · inbox (فوق الرسائل، فيها «لاحقًا») · sheet (بحسابي)
+    function installHTML(where = 'inbox') {
+        if (standalone() || (where === 'inbox' && store.get(K.inst) === '1')) return '';
+        const label = TO_CHROME ? 'افتح بـ Chrome' : 'تثبيت التطبيق';
+        const lead = installed ? 'جارٍ التثبيت… بيطلع بين تطبيقاتك خلال ثواني'
+            : TO_CHROME ? 'هالمتصفح ما بيثبّت تطبيقات، افتحو بـ Chrome وثبّتو من هونيك'
+            : isIOS() ? 'بيفتح بكبسة متل أي تطبيق. عالآيفون إشعار الرسائل بيشتغل بس بعد التثبيت'
+            : 'بيفتح بكبسة متل أي تطبيق، وبيوصلك إشعار بكل رسالة جديدة';
+        const help = PLAT === 'android' ? `<details class="inst-help"${installed && brand ? ' open' : ''}><summary>ثبّتو وما طلعت الأيقونة؟</summary><div>${BRANDS.map(([id, name, tip]) =>
+            `<details class="inst-brand"${id === (brand || 'all') ? ' open' : ''}><summary>${name}${id === brand ? '<i>جوالك</i>' : ''}</summary><p>${tip}</p></details>`).join('')}</div></details>` : '';
+        return `<section class="inst" data-inst="${where}" aria-label="تثبيت التطبيق">
+            <div class="inst-head"><img src="icons/icon-192.png" alt="" width="52" height="52" decoding="async"><span><b>ثبّت تطبيق الفريق</b><small>${lead}</small></span></div>
+            ${installed ? '' : `<div class="inst-actions"><button class="btn inst-go${deferredInstall ? ' is-ready' : ''}" type="button" data-act="install"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>${label}</button>${where === 'inbox' ? '<button class="btn soft" type="button" data-act="install-hide">لاحقًا</button>' : ''}</div>
+            <p class="inst-how">${deferredInstall ? 'أو بالطريقة اليدوية:' : 'الطريقة:'}</p>
+            <ol class="inst-steps">${STEPS[PLAT].map(s => `<li><span>${s}</span></li>`).join('')}</ol>`}
+            ${help}
+        </section>`;
+    }
+    // بنرسم البطاقة من جديد وين ما كانت (لما يجهز التثبيت بكبسة، أو بعد التثبيت، أو لما نعرف الشركة)
+    function paintInstall() {
+        const li = $('login-inst'); if (li) li.innerHTML = installHTML('login');
+        if (tok && S.tab === 'inbox' && !S.open) render();
+        const sh = $('sheet-body').querySelector('[data-inst="sheet"]'); if (sh) sh.outerHTML = installHTML('sheet');
+    }
+    async function doInstall(btn) {
+        if (deferredInstall) {
+            const p = deferredInstall; deferredInstall = null;
+            p.prompt();
+            try { if ((await p.userChoice).outcome === 'accepted') { installed = true; toast(['xiaomi', 'oppo', 'vivo', 'huawei', 'transsion'].includes(brand) ? 'جارٍ التثبيت… إذا ما طلعت الأيقونة شوف الخطوات تحت' : 'جارٍ التثبيت… بيطلع بين تطبيقاتك'); } } catch (e) {}
+            paintInstall();
+            return;
+        }
+        if (TO_CHROME) {
+            try { navigator.clipboard.writeText(APP_URL).catch(() => {}); } catch (e) {}
+            toast('عم يفتح Chrome… إذا ما انفتح، الرابط منسوخ: الصقو فيه');
+            location.href = chromeIntent();
+            return;
+        }
+        if (IN_APP) {
+            try { await navigator.clipboard.writeText(APP_URL); toast('انتسخ الرابط، افتحو بـ Safari وثبّتو من هونيك'); } catch (e) { toast('افتح الرابط بـ Safari: ' + APP_URL); }
+        } else toast(isIOS() ? 'عالآيفون: اتبع الخطوات تحت الزر ↓' : 'اتبع الخطوات تحت الزر ↓');
+        const ol = btn.closest('.inst')?.querySelector('.inst-steps');
+        if (ol) { ol.classList.remove('pulse'); void ol.offsetWidth; ol.classList.add('pulse'); ol.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
     }
     function inboxHTML() {
         const c = S.counts, sel = S.archived ? 'archived' : S.filter;
@@ -322,8 +407,8 @@
         v.innerHTML = `<div class="meta">${tagHTML(m.type)}${starsHTML(m.stars)}<time>${when(m.at)}</time></div>
             ${lines.length ? `<details class="devinfo"><summary>الجهاز</summary><div>${lines.map(l => `<span>${esc(l)}</span>`).join('')}</div></details>` : ''}
             <div class="thread"><div class="bub u">${esc(m.text)}<small>من مستخدم بمُذكّر · ${when(m.at)}</small></div>${reply}</div>
-            ${answer ? `<div class="msg-actions">${m.reply && !S.editing ? '<button class="btn soft" type="button" data-act="edit">عدّل الرد</button>' : ''}<button class="btn soft" type="button" data-act="${m.arch ? 'unarchive' : 'archive'}">${m.arch ? 'رجّعها من الأرشيف' : 'أرشفة'}</button></div>
-            ${!m.reply || S.editing ? `<form class="composer" id="composer" novalidate>
+            <div class="msg-actions"><button class="btn soft" type="button" data-act="copy-msg">نسخ النص</button>${answer ? `${m.reply && !S.editing ? '<button class="btn soft" type="button" data-act="edit">عدّل الرد</button>' : ''}<button class="btn soft" type="button" data-act="${m.arch ? 'unarchive' : 'archive'}">${m.arch ? 'رجّعها من الأرشيف' : 'أرشفة'}</button>` : ''}</div>
+            ${answer ? `${!m.reply || S.editing ? `<form class="composer" id="composer" novalidate>
                 <label class="vh" for="reply-text">ردّك</label>
                 <textarea id="reply-text" rows="1" maxlength="1000" placeholder="${m.reply ? 'عدّل الرد… (بيبدّل القديم)' : 'اكتب ردّك… بيوصل جوّا مُذكّر'}">${S.editing ? esc(m.reply) : ''}</textarea>
                 <button class="send" type="submit" aria-label="إرسال الرد" disabled>${ICON.send}</button></form>
@@ -403,6 +488,20 @@
             [true, 'نسخة مُذكّر المنشورة', S.live ? 'الإصدار ' + num(S.live) : 'ما قدرنا نعرف'],
             [h.devsubs > 0, 'إشعار الرسائل للفريق', h.devsubs ? `مفعّل على ${devices(h.devsubs)}` : 'ولا جهاز مفعّل']
         ];
+        // سيرفر 31: وين محفوظين المشتركين، وقديش بيلحق يبعت
+        if (h.store) {
+            const gen = h.count ? h.count.general : null;
+            rows.splice(2, 1,
+                [h.store === 'd1' && !h.migErr, 'التخزين', h.store === 'd1'
+                    ? (h.migErr ? 'D1، بس صار خطأ بالنقل. افحص من جديد بعد دقيقة' : h.moving ? `D1، وعم ينقل المشتركين من KV (${num(h.moved)} لهلّق)` : 'D1، قاعدة البيانات الكبيرة')
+                    : 'KV بس، وهاد بيتحمّل ناس قلال. فعّل D1 (الخطوات بملف السيرفر)'],
+                [!h.full && !h.waiting && !(gen > h.perQuarter), 'قديش بيلحق', `${num(h.budget)} إشعار بالدقيقة، يعني الذكر العام لـ ${num(h.perQuarter)} شخص كل ربع ساعة`
+                    + (gen !== null ? `، والمفعّلين هلّق ${num(gen)}` : '')
+                    + (h.full || gen > h.perQuarter ? '. وصلنا للحد: في ناس الذكر العام عم يوصلهن أبطأ' : '')
+                    + (h.waiting ? `، و${num(h.waiting)} تذكير تأخّر دقيقة` : '')]
+            );
+            if (h.err) rows.push([false, 'خطأ بآخر تشغيل', h.err]);
+        }
         return `<section class="panel"><h2>الفحص</h2>${rows.map(([ok, n, s]) => `<div class="check${ok ? '' : ' warn'}"><i aria-hidden="true"></i><span>${n}</span><em>${esc(s)}</em></div>`).join('')}
             <button class="btn soft" type="button" data-act="recheck">${ICON.refresh}افحص من جديد</button></section>`;
     }
@@ -554,6 +653,7 @@
         openSheet(`<h2 id="sheet-h">${esc(me.name)} <span class="role ${me.role}">${ROLE_AR[me.role]}</span></h2>
             <div class="switch-row"><span><b id="push-l">إشعار برسالة جديدة</b><small>على هالجهاز${isIOS() && !standalone() ? '، وعالآيفون لازم تثبّت التطبيق أول' : ''}</small></span><button type="button" class="sw" role="switch" aria-checked="${pushOn}" aria-labelledby="push-l" data-act="push"></button></div>
             ${pushOn ? '<button class="btn soft wide" type="button" data-act="push-test">إشعار تجريبي لهالجهاز</button>' : ''}
+            ${installHTML('sheet')}
             <button class="btn danger wide" type="button" data-act="logout">قفل التطبيق على هالجهاز</button>
             <p class="fine">${me.role === 'owner' ? 'بترجع تفوت بكلمة السر.' : 'بترجع تفوت بنفس رمزك على هالجهاز بس.'} · فريق مُذكّر، النسخة ${VERSION}</p>`);
     }
@@ -609,10 +709,10 @@
 
     // ===================== الكبسات =====================
     let deferredInstall = null;
-    async function copy(text) {
+    async function copy(text, sel = 'big-code') {
         try { await navigator.clipboard.writeText(text); toast('انتسخ ✓'); }
         catch (e) {
-            const el = $('big-code');
+            const el = typeof sel === 'string' ? $(sel) : sel;
             if (el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
             toast('حدّدتلك ياه، انسخو من القائمة');
         }
@@ -638,8 +738,7 @@
             else if (act === 'recheck') { S.health = null; render(); loadNums(); }
             else if (act === 'ann-clear') { const r = await api('/dev/announce', { clear: true }); if (r.ok) { if (S.stats) S.stats.announce = null; $('ann-now').innerHTML = annNowHTML(); toast('وقف الإعلان ✓'); } }
             else if (act === 'new-code') newCodeSheet();
-            else if (act === 'install' && deferredInstall) { deferredInstall.prompt(); deferredInstall = null; }
-            else if (act === 'install-hide') { store.set(K.inst, '1'); render(); }
+            else if (act === 'copy-msg') { const m = S.items.find(x => x.id === S.open); if (m) copy(m.text, document.querySelector('.bub.u')); }
             else if (t.id === 'ann-push') t.setAttribute('aria-checked', String(t.getAttribute('aria-checked') !== 'true'));
         });
         $('view').addEventListener('submit', e => { if (e.target.id === 'ann-form') { e.preventDefault(); publish(); } });
@@ -669,7 +768,17 @@
         });
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
         addEventListener('popstate', () => { if (!$('sheet').hidden) closeSheet(); if (S.open) closeMsg(true); });
-        addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; if (S.tab === 'inbox' && !S.open && tok) render(); });
+        // التثبيت: الزر موجود بالدخول وبالرسائل وبحسابي، فمنسمع عالصفحة كلها
+        document.addEventListener('click', e => {
+            const t = e.target.closest('[data-act="install"], [data-act="install-hide"]'); if (!t) return;
+            if (t.dataset.act === 'install') doInstall(t);
+            else { store.set(K.inst, '1'); render(); }
+        });
+        addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; paintInstall(); });
+        addEventListener('appinstalled', () => { deferredInstall = null; installed = true; paintInstall(); });
+        // وقت الكتابة: الشريط تحت بيختفي حتى يضل مطرح للكتابة فوق الكيبورد
+        document.addEventListener('focusin', e => { if (e.target.matches('textarea, input:not([type="checkbox"]):not([type="radio"])')) document.body.classList.add('typing'); });
+        document.addEventListener('focusout', () => setTimeout(() => { if (!document.activeElement || !document.activeElement.matches('textarea, input')) document.body.classList.remove('typing'); }, 60));
         // رجعت عالتطبيق، أو إجا إشعار: منحدّث الرسائل
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && tok && S.tab === 'inbox') loadInbox(); });
         setInterval(() => { if (document.visibilityState === 'visible' && tok && S.tab === 'inbox' && !S.open) loadInbox(); }, 60000);
@@ -684,7 +793,7 @@
             const had = !!navigator.serviceWorker.controller;
             navigator.serviceWorker.addEventListener('controllerchange', () => { if (had && !reloaded) { reloaded = true; location.reload(); } });
         }
-        bindBoxes(); bindClicks();
+        bindBoxes(); bindClicks(); detectBrand();
         // صاحب التطبيق كان داخل من صفحة المطوّر القديمة بمُذكّر (نفس الموقع): بيفوت لحالو
         if (!tok && store.get(K.legacy)) tok = store.get(K.legacy);
         if (!tok) { showLogin(); return; }
