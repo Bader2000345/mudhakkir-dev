@@ -1,7 +1,7 @@
 /* فريق مُذكّر — sw.js
  * الملفات بتنحفظ حتى يفتح التطبيق بسرعة (وبلا نت بيبين آخر شي)، والإشعار «رسالة جديدة» من السيرفر.
  * غيّر CACHE مع كل تحديث للملفات. */
-const CACHE = 'mdt-v3';
+const CACHE = 'mdt-v4';
 const FILES = ['./', './index.html', './app.css', './app.js', './manifest.json', './icons/icon-192.png', './icons/icon-512.png', './icons/favicon-64.png', './icons/apple-touch-icon.png', './icons/badge-96.png'];
 
 self.addEventListener('install', event => {

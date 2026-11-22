@@ -10,6 +10,8 @@
  * ===================================================================== */
 (() => {
     'use strict';
+    // النسخة 4 (الأمان): ما منشتغل جوّا إطار بموقع تاني (حتى ما حدا يغطّي التطبيق بصفحتو ويخلّي صاحب الرمز يكبس شي ما بدو ياه)
+    if (window.top !== window.self) { document.documentElement.style.display = 'none'; return; }
     const API_LIVE = 'https://mudhakkir-push.bader-bm-2000.workers.dev';
     // للتجربة على الكمبيوتر بس: ?api=http://127.0.0.1:8787 (ما بيشتغل على الموقع الحقيقي)
     const API = (() => {
@@ -22,7 +24,7 @@
     const VAPID = 'BHIWTXCv4Gmy6fy5fbsJ_NX4fLD0dkEo2PqyCVWzmbxaxw8xo8Ud9eMw_rZOp_qxOaDkSEThGzQbhQhSCQ6p2_8';
     const APP_URL = 'https://bader2000345.github.io/mudhakkir-dev/';
     const LIVE_VERSION = 'https://bader2000345.github.io/reminder/version.json';
-    const VERSION = 3;
+    const VERSION = 4;
     // mudhakkir-dev-id و mudhakkir-dev-device: نفس مفاتيح صفحة المطوّر القديمة بمُذكّر (نفس الموقع)،
     // فجهاز صاحب التطبيق يلي كان مسجّل بيفوت لحالو وما بينحسب جهاز جديد
     const K = { tok: 'mdt-tok', me: 'mdt-me', push: 'mdt-push', pushAt: 'mdt-push-at', inst: 'mdt-install-hide', dev: 'mudhakkir-dev-id', legacy: 'mudhakkir-dev-device' };
